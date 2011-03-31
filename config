@@ -276,7 +276,8 @@
    # NET_INSTALL_TYPE=3, then do not set to SYNC!
    # When set to anything else GLIS will untar/compress the portage tree
    # to /usr/portage. Note that only tar bz2 files will be accepted.
-   PORTAGE_TREE="/mnt/cdrom/snapshots/portage-*.tar.bz2"
+   # PORTAGE_TREE="/mnt/cdrom/snapshots/portage-*.tar.bz2"
+   PORTAGE_TREE="ftp://ftp.df.lth.se/pub/gentoo/releases/snapshots/current/portage-latest.tar.bz2"
 
    # This is the flags to be used during install for the emerge command
    # For instance, if you want to use binary packages when available, add "-k"
