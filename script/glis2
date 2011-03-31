@@ -1,0 +1,68 @@
+#!/bin/bash
+
+#***--glis--******************************************************************
+#
+#     Gentoo Linux Install Script Mk II (GLIS2) - version 0.1
+#
+#        Copyright 2003 Rob Holland, Michael Cummings and Nathaniel McCallum. 
+#
+#    For all queries about this code, please contact the current authors
+#    by visiting the #glis channel on irc.freenode.net. Please don't
+#    ask the Gentoo project for support or help using GLIS, they
+#    don't write or maintain the code.
+#
+#    This program is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    This software is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#*****************************************************************************
+
+source ./glis-functions
+
+CONF="/tmp/glis-config"
+CLASS_CONF="/tmp/glis-class-config"
+
+print_usage () {
+	echo
+	echo "Usage:"
+	echo "	./glis2 [-n] [config-file-url]"
+	echo
+	echo "	 -n	Dry run. Print out what glis would do if it ran for real"
+	echo "   -v	Verbose. Tell us whats happening"
+	echo
+}
+
+# Grab any command line options we were given
+
+while getopts "nv" opt
+	do
+		case $opt in
+		n) DRY_RUN=1;;
+		v) VERBOSE=1;;
+		*) print_usage && exit 1;;
+		esac
+done
+
+# Right, first things first, lets download the config they've pointed us at and see
+# if it parses ok
+
+URI=${@:$OPTIND:1}
+
+# download the file if we're not doing a class-based install, else just move
+# it into place from where glis-bootstrap dropped it
+
+if [ ! -z "${URI}" ]; then
+	download_file ${URI} ${CONF}
+else
+	mv ${CLASS_CONF} ${CONF}
+fi
+
+# read it in... :)
+
+source ${CONF}

@@ -1,0 +1,7 @@
+rm -f glis-${version}.bin
+rm -f script/.DS_Store
+rm -f script/functions/.DS_Store
+version=`grep 'echo -e ' glisheader.sh | sed 's/.*GLIS \(.*\) - .*/\1/'`
+tar czf glis-${version}.tar.gz script
+cat glisheader.sh glis-${version}.tar.gz > glis-${version}.bin
+rm -f glis-${version}.tar.gz

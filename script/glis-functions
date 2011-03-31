@@ -1,0 +1,46 @@
+# functions used by glis
+
+download_file () {
+	local URI
+	local DEST
+
+	URI="$1"
+	DEST="$2"
+
+	[ ${VERBOSE} ] && echo "called download_file ${URI} - ${DEST}"
+
+	# pick out which protocol we need to use to grab the file
+
+	[ -z ${URI/#http:*/} ] && MODE="HTTP"
+	[ -z ${URI/#ftp:*/} ] && MODE="FTP"
+	[ -z ${URI/#tftp:*/} ] && MODE="TFTP"
+	[ -z ${URI/#file:*/} ] && MODE="FILE"
+
+	# do stuff depending on which of the above we've chosen
+
+	if [ ${MODE} == "HTTP" ]; then
+		[ ${VERBOSE} ] && echo "running wget to grab the config file over http: ${URI}"
+		wget -O ${DEST} ${URI}
+	elif [ ${MODE} == "FTP" ]; then
+		[ ${VERBOSE} ] && echo "running wget to grab the config file over ftp: ${URI}"
+		wget --passive-ftp -O ${DEST} ${URI}
+	elif [ ${MODE} == "TFTP" ]; then
+		URI=${URI/tftp:\/\//}
+		URI=${URI/\//:}
+		[ ${VERBOSE} ] && echo "running tftp to grab the config file over tftp: ${URI}"
+		# this isn't right, need to hack the hostname out of the URI
+		tftp -c "get ${URI}"
+	elif [ ${MODE} == "FILE" ]; then
+		URI=${URI/file:\/\//}
+		[ ${VERBOSE} ] && echo "running cp to grab the config file: ${URI}"
+		cp ${URI} ${DEST}
+	else
+		echo "Unknown mode: ${MODE}" && exit 1
+	fi
+
+	# die if we couldn't download the file
+
+	if [ ! -f ${DEST} ]; then
+		echo "failed to download the file" && exit 1
+	fi
+}

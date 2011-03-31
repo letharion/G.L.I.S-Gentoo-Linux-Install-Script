@@ -1,0 +1,206 @@
+#!/bin/bash
+
+echo_usage()
+{
+echo "Usage: glis installstep [installstep ...] /path/to/config/file"
+echo "Install Steps:"
+echo "    1 -- Network Setup"
+echo "    2 -- Partitioning"
+echo "    3 -- Unpack Tarball"
+echo "    4 -- Prepare System"
+echo "    5 -- Get Portage Tree"
+echo "    6 -- Bootstrap"
+echo "    7 -- Emerge System"
+echo "    8 -- Build Kernel"
+echo "    9 -- Emerge Utilites"
+echo "   10 -- Implement Configuration"
+echo "   11 -- Emerge Misc."
+echo "  ALL -- Perform all steps"
+echo "Config File:"
+echo "  The config file MUST exist"
+}
+
+# This function will install distcc if it hasn't been installed and execute
+# distcc if it hasn't been executed. Perhaps this should be in it's own
+# file, say 055-setup_distcc.sh?
+use_distcc()
+{
+   # If DISTCC_HOSTS is set AND distcc hasn't been installed.
+   if [ "{NET_INSTALL_TYPE}" != "1" ] && [ "${DISTCC_HOSTS}" ] && \
+      [ ! -e "/mnt/gentoo/usr/bin/distcc" ]; then
+      # Get and set the features.
+      if [ $(grep "^[ \t]*FEATURES[ \t]*=[ \t]*\"" /mnt/gentoo/etc/make.conf \
+          | grep -ci distcc) -eq 0 ]; then
+         CUR_FEATURES=$(grep "^[ \t]*FEATURES[ \t]*=[ \t]*\".*\"" \
+            /mnt/gentoo/etc/make.conf | sed -e 's/.*"\(.*\)"/\1/')
+         write_config "FEATURES" "FEATURES=\"$CUR_FEATURES distcc\"" \
+            "/mnt/gentoo/etc/make.conf" "="
+      fi
+
+      # Get and set the number of hosts.
+      J=$(expr `echo $DISTCC_HOSTS | awk -F " +" '{print NF}'` + 1)
+      write_config "MAKEOPTS" "MAKEOPTS=\"-j${J}\"" \
+         "/mnt/gentoo/etc/make.conf" "="
+      
+      # Add the distcc user to passwd
+      if [ $(grep -c distcc /mnt/gentoo/etc/passwd) -eq 0 ]; then
+         echo "distcc:x:240:2:distccd:/dev/null:/bin/false" >> \
+            /mnt/gentoo/etc/passwd
+      fi
+
+      chroot /mnt/gentoo env USE='-*' emerge --nodeps distcc
+
+      chroot /mnt/gentoo /usr/bin/distcc-config --install
+      chroot /mnt/gentoo /usr/bin/distcc-config --set-hosts $DISTCC_HOSTS
+   fi
+}
+
+# This function carries out the execution process for each glis function.
+# It prints out the ebegin/eend message and executes any user defined hooks
+# that may exist as well as simply executing the specified function.
+execute() {
+  if [ -f "${HOOKS_LOCATION}${1}-pre.sh" ]; then
+     /bin/bash ${HOOKS_LOCATION}${1}-pre.sh
+  fi
+
+  # Execute the specified function
+  ${2} || return ${1}
+  
+  if [ -f "${HOOKS_LOCATION}${1}-post.sh" ]; then
+     /bin/bash ${HOOKS_LOCATION}${1}-post.sh
+  fi
+}
+
+run_step() {
+   # Process the arguements
+   # If invalid arguement, give usage
+   
+   case "$1" in
+       1) execute "0${1}0" network_pre || return ${1};;
+
+       2) execute "0${1}0" partition_system || return ${1};;
+
+       3) execute "0${1}0" unpack_tarball || return ${1};;
+
+       4) execute "0${1}0" prepare_system || return ${1};;
+
+       5) execute "0${1}0" portage_tree || return ${1};;
+
+       6) execute "0${1}0" bootstrap || return ${1};;
+
+       7) execute "0${1}0" emerge_system || return ${1};;
+
+       8) use_distcc
+          execute "0${1}0" build_kernel || return ${1};;
+
+       9) use_distcc
+          execute "0${1}0" emerge_utilities || return ${1};;
+
+      10) execute "${1}0" implement_config || return ${1};;
+
+      11) execute "${1}0" emerge_misc || return ${1};;
+
+       *) echo_usage
+          return -255;;
+   esac
+}
+
+# Definitions for the simplest glis functions
+# Step 6
+bootstrap() {
+   if [ ${INSTALL_STAGE} -eq 1 ]; then
+      use_distcc
+      chroot /mnt/gentoo /usr/portage/scripts/bootstrap.sh || return ${1}
+   fi
+}
+
+# Step 7
+emerge_system() {
+   if [ ${INSTALL_STAGE} -eq 1 ] || [ ${INSTALL_STAGE} -eq 2 ]; then
+      use_distcc
+      chroot /mnt/gentoo emerge ${EMERGE_OPTIONS} system || return ${1}
+   fi
+}
+
+# Step 11
+emerge_misc() {
+   if [ "${MISC_PROGRAMS}" != "" ]; then
+      use_distcc
+      chroot /mnt/gentoo emerge ${EMERGE_OPTIONS} ${MISC_PROGRAMS} \
+         || return ${1}
+   fi
+}
+
+# Source the functions.sh for gentoo
+# This give us some nice pretty stuff like ebegin and eend
+source /etc/init.d/functions.sh
+
+# Make sure the number of arguements is correct
+if [ $# -lt 2 ]; then
+   echo_usage
+   exit -255
+fi
+
+eval GLIS_CONFIG=\${$#}
+
+# If the config file exists, then source it
+# Also, source the fuctions we will use
+if [ -f ${GLIS_CONFIG} ]; then
+   export GLIS_CONFIG=${GLIS_CONFIG}
+   source ${GLIS_CONFIG}
+   source functions/000-write_config.sh
+   source functions/010-network_pre.sh
+   source functions/020-partition_system.sh
+   source functions/030-unpack_tarball.sh
+   source functions/040-prepare_system.sh
+   source functions/050-portage_tree.sh
+   source functions/080-build_kernel.sh
+   source functions/090-emerge_utilities.sh
+   source functions/100-implement_config.sh
+
+   # If install stage is not set, or is out of range, set to stage 1
+   if [ "${INSTALL_STAGE}" == "" ] || [ ${INSTALL_STAGE} -lt 1 ] || \
+      [ ${INSTALL_STAGE} -gt 3 ]; then
+      INSTALL_STAGE=1
+      write_config "INSTALL_STAGE" "INSTALL_STAGE=1" "${GLIS_CONFIG}" "="
+   fi
+
+# Else, give usage
+else
+   echo "Config file: ${GLIS_CONFIG} does not exist or is not a regular file."
+   echo_usage
+   exit -255
+fi
+
+# Export relevant needed variables
+[ "${PORTAGE_TMPDIR}" != "" ] && export PORTAGE_TMPDIR
+[ "${HTTP_PROXY_PRE}" != "" ] && export http_proxy=${HTTP_PROXY_PRE}
+[ "${FTP_PROXY_PRE}" != "" ] && export ftp_proxy=${FTP_PROXY_PRE}
+[ "${RSYNC_PROXY_PRE}" != "" ] && export RSYNC_PROXY=${RSYNC_PROXY_PRE}
+
+
+# Make sure hooks is set and is followed by a trailing slash
+if [ "${HOOKS_LOCATION}" == "" ]; then
+   HOOKS_LOCATION="./"
+   write_config "HOOKS_LOCATION" "HOOKS_LOCATION=\"${HOOKS_LOCATION}\"" \
+      "${GLIS_CONFIG}" "="   
+elif [ $(echo "${HOOKS_LOCATION}" | grep -c "/$") -eq 0 ]; then
+   HOOKS_LOCATION="${HOOKS_LOCATION}/"
+   write_config "HOOKS_LOCATION" "HOOKS_LOCATION=\"${HOOKS_LOCATION}\"" \
+      "${GLIS_CONFIG}" "="   
+fi
+
+
+# Determine which steps to execute
+if [ $(echo "${1}" | grep -ic "ALL") -eq 1 ]; then
+   # ALL was selected, so execute all of the steps
+   for step in 1 2 3 4 5 6 7 8 9 10 11; do
+      run_step ${step} || exit ${step}
+   done
+else
+   # Run each of the specified steps
+   for (( stepi=1; $stepi < $#; stepi++ )); do
+      eval step=\${$stepi}
+      run_step $step || exit ${step}
+   done
+fi

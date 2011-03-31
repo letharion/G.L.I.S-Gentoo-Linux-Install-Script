@@ -1,0 +1,40 @@
+# $Id: README,v 1.2 2003/08/18 14:57:37 robholland Exp $
+# GLIS README
+
+glis is designed to automate the install of gentoo machines. it allows you to
+use one of a number of methods to supply it with a config file and then just gets
+on with the install without needing supervision.
+
+there are (will be) a number of GUIs for creating the config file (we hope). its
+not too hard to write a config "by hand" by hacking at the sample which comes with
+glis, so we hope the current lack of a GUI will not prove an obstacle.
+
+a standard glis gentoo install would work something like this:
+
+1. boot somehow
+2. run:
+$ glis --config http://your-web-server.net/glis-config
+or
+$ glis --config ftp://your-ftp-server.net/glis-config
+or
+$ glis --config server-name:/path/to/glis-config
+
+the machine should install gentoo according to you config, then reboot itself
+and be ready to go.
+
+thats about it...
+
+a enterprise style install would work like this:
+
+1. decide on some classes for your machines such as "webserver", "mailserver" etc
+2. create a glis config for each type of machine
+3. create a class-index.txt file which lists class names and the path to their config
+4. create a boot-config for each class
+4. boot a machine
+5. run glis-bootstrap
+
+the machine should install gentoo accoring to the class config and reboot
+
+see the sample config file for details of how it works :)
+
+enjoy!
