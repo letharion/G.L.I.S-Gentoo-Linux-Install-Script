@@ -25,7 +25,7 @@ fi
 
 # Set proc and dev mount points
 [ $(mount | grep -c "/mnt/gentoo/proc") -gt 0 ] && umount /mnt/gentoo/proc
-mount -t proc proc /mnt/gentoo/proc
+mount -t proc none /mnt/gentoo/proc
 if [ $? -ne 0 ]; then
    eend 1
    echo "!!! Error #0402: Could not mount /proc in new system."
@@ -34,7 +34,7 @@ fi
 
 [ ! -d /mnt/gentoo/dev ] && mkdir /mnt/gentoo/dev
 [ $(mount | grep -c "/mnt/gentoo/dev") -gt 0 ] && umount /mnt/gentoo/dev
-mount -t devfs dev /mnt/gentoo/dev
+mount --rbind /dev /mnt/gentoo/dev
 if [ $? -ne 0 ]; then
    eend 1
    echo "!!! Error #0403: Could not mount /dev in new system."
