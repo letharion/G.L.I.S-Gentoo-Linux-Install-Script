@@ -18,6 +18,18 @@ elif [ $(echo ${PORTAGE_TREE} | grep -ic "^SYNC$") -eq 1 ]; then
       echo "!!! Error #0502: Emerge sync failed."
       return 1
    fi
+elif [ ! -z "$(echo "${PORTAGE_TREE}" | grep -E "(^ftp|^http)://")" ]; then
+   wget "${PORTAGE_TREE}"
+   if [ $? -ne 0 ]; then
+      echo "!!! Error #0301: Error downloading tarball \"${PORTAGE_TREE}\""
+      return 1
+   fi
+   tarball=$(echo "${PORTAGE_TREE}" | sed 's/.*\/\([^\/]*\)/\1/')
+   tar -xvjpf ${tarball} -C /mnt/gentoo
+   if [ $? -ne 0 ]; then
+      echo "!!! Error #0302: Error unpacking tarball ${tarball}"
+      return 1
+   fi
 else
    # Unpack the specified portage snapshot.
    if [ -e ${PORTAGE_TREE} ]; then
