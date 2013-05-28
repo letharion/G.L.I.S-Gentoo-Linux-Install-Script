@@ -27,8 +27,7 @@ fi
 
 # Check which type the kernel is and which dir the kernel is in and
 # store it in variables
-KERNEL_VER=$(ls -1 /mnt/gentoo/usr/src | grep -E "linux-2.[46].*" | \
-   sed 's/^linux-\(2.[46]\).*/\1/g')
+KERNEL_VER=$(ls -1 /mnt/gentoo/usr/src | grep -E "linux-3.*" | sed 's/^linux-\(3.*\)/\1/g')
 
 if [ -z ${KERNEL_VER} ]; then
    echo "!!! Error #0803: No kernel sources found!"
