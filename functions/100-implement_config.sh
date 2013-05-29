@@ -9,7 +9,7 @@ if [ "${ROOT_PASSWORD_HASH}" == "" ]; then
    return 1
 fi
 
-echo "root:${ROOT_PASSWORD_HASH}" | chroot /mnt/gentoo chpasswd -e
+echo "root:${ROOT_PASSWORD_HASH}" | chroot /mnt/gentoo chpasswd
 if [ $? -ne 0 ]; then
    echo "!!! Error #1002: Could not set root password."
    return 1
