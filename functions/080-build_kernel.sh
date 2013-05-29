@@ -107,7 +107,7 @@ else
    fi
    
    # Install kernel
-   cp /mnt/gentoo/usr/src/linux/arch/i386/boot/bzImage /mnt/gentoo/boot/vmlinuz
+   cp /mnt/gentoo/usr/src/linux/arch/x86/boot/bzImage /mnt/gentoo/boot/vmlinuz
    if [ $? -ne 0 ]; then
       echo "!!! Error #0810: Could not install vmlinuz to /boot."
       return 1
