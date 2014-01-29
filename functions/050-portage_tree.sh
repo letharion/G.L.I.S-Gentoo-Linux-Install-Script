@@ -25,7 +25,7 @@ elif [ ! -z "$(echo "${PORTAGE_TREE}" | grep -E "(^ftp|^http)://")" ]; then
       return 1
    fi
    tarball=$(echo "${PORTAGE_TREE}" | sed 's/.*\/\([^\/]*\)/\1/')
-   tar -xvjpf ${tarball} -C /mnt/gentoo
+   tar -xvaf ${tarball} -C /mnt/gentoo/usr
    if [ $? -ne 0 ]; then
       echo "!!! Error #0302: Error unpacking tarball ${tarball}"
       return 1
