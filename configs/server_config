@@ -1,0 +1,442 @@
+# Glis sample config file
+
+# This file should contain every possible option that will
+# be recognised by the installer.
+#
+# When you configure a variable, DO NOT leave spaces around the "=" sign.
+#
+# NOTE: In true/false scenarios, 0=false 1=true
+
+#----------------------#
+# Network PRE Settings #
+#----------------------#
+
+   # Type of network installation
+   # 0 - Ethernet (default)
+   # 1 - ADSL
+   # 2 - Dial-up
+   # 3 - No network setup
+   # If you select 4 the GLIS will skip the emerge sync phase of the install,
+   # instead using the portage snapshot specified by PORTAGE_TREE.  This will
+   # install older software, but internet access is not needed. This will NOT
+   # disable network access from the liveCD.  It just doesn't use the net
+   # during the install.
+   #
+   # If NET_INSTALL_TYPE is not set, it defaults to 0
+   NET_INSTALL_TYPE="0"
+
+   # The network interface defaults to DHCP (by omision of any of the below).
+   # To make the interface static, set the following options.
+   # There are 6 variables that need to be set:
+   #    IFACE_PRE
+   #    IFACE_IP_PRE
+   #    IFACE_NETMASK_PRE
+   #    IFACE_GATEWAY_PRE
+   #    IFACE_BROADCAST_PRE
+   #    NAMESERV_PRE (space delimited)
+   # If ANY of these are NOT set, the interface will default back to DHCP.
+   # NOTE: you can only define one static interface for the installation,
+   # however, you can define as many as you wish for the post installation
+   # system.
+   # IFACE_PRE="eth0"
+   # IFACE_IP_PRE="192.168.0.2"
+   # IFACE_NETMASK_PRE="255.255.255.0"
+   # IFACE_BROADCAST_PRE="192.168.0.255"
+   # IFACE_GATEWAY_PRE="192.168.0.1"
+   # NAMESERV_PRE="198.41.0.4 198.32.64.12"
+   
+   # Proxy PREs (if you don't want a proxy, just leave these out)
+   #HTTP_PROXY_PRE="http://machine.company.com:1234"
+   #FTP_PROXY_PRE="ftp://machine.company.com"
+   #RSYNC_PROXY_PRE="rsync://machine.company.com"
+
+#-----------------------#
+# Network POST Settings #
+#-----------------------#
+   # Name settings
+   # If the value equals "DHCP" (Case IMPORTANT!!!) then install will pull
+   # value from DHCP.
+   # If HOSTNAME is not set, it defaults to "localhost"
+   # If DOMAIN is not set, it defaults to "localdomain"
+   # If NISDOMAIN is not set, it defaults to NULL
+   DOMAIN="DHCP"
+   HOSTNAME="DHCP"
+   #NISDOMAIN="DHCP"
+   
+   # Proxy POSTs (if you don't want a proxy, just leave these out)
+   #HTTP_PROXY_POST="http://machine.company.com:1234"
+   #FTP_PROXY_POST="ftp://machine.company.com"
+   #RSYNC_PROXY_POST="rsync://machine.company.com"
+
+   # All interfaces default to DHCP (by their omision).
+   # To make an interface static, set the following options (per interface).
+   #
+   # The 'x' within the brackets ('[' and ']') needs to be replaced with the
+   # number of the interface.  ie. If you are setting up eth0, you should
+   # change 'x' to '0'.  
+   #
+   # There are 4 variables that need to be set:
+   #    IFACE_POST
+   #    IFACE_IP
+   #    IFACE_NETMASK
+   #    IFACE_BROADCAST
+   # IFACE_POST represents the interface name (i.e. eth0, wlan0) and must
+   # be specified if you want the device configured.
+   # If any of the last three are NOT set, the interface will default to DHCP.
+   #
+   # There is 1 variable that is optional:
+   #    IFACE_GATEWAY
+   # If this is not setup, then there will be no gateway setup.
+
+   # IFACE_POST[0]="eth0"
+   # IFACE_IP_POST[0]="192.168.0.22"
+   # IFACE_NETMASK_POST[0]="255.255.255.0"      
+   # IFACE_BROADCAST_POST[0]="192.168.0.255"
+   # IFACE_GATEWAY_POST[0]="192.168.0.1"         # Optional
+   
+   # Interface aliases for the POSTinstall system
+   # This defines aliases for interface ethx
+   # If IFACE_ALIAS[x] is not defined, no aliases will be created
+   # Aliased IPs MUST be space seperated
+   #IFACE_ALIAS[x]="10.0.0.4 10.0.0.5"
+   
+   # The following define custom broadcast and netmask settings for the aliases
+   # If IFACE_ALIAS_BROADCAST is not defined, it defaults to the broadcast for
+   # the interface.
+   # If IFACE_ALIAS_NETMASK is not defined, it defaults to the netmask for
+   # the interface.
+   #IFACE_ALIAS_BROADCAST[x]="10.255.255.255 10.255.255.255"
+   #IFACE_ALIAS_NETMASK[x]="255.255.0.0 255.255.255.0"
+
+   # Load interface during boot when new system is installed?
+   # If IFACE_BOOT[x] is not set, it defaults to "1"
+   # NOTE: Interfaces that use PCMCIA should be set to FALSE (0)!
+   #IFACE_BOOT[x]="0"
+	  
+   # Name Servers (DNS Servers)
+   # In most cases you should only need to set these if you are using a
+   # static interface.
+   # These are NOT interface dependant
+   # For more than one name server, please seperate them by spaces.
+   # NAMESERV_POST="10.10.10.4 10.10.10.7"
+
+
+#------------------#
+# Dial-up Settings #
+#------------------#
+   # Note: These settings will currently only be used for installing GLIS,
+   # not for post install configuration.
+
+   # Dial-up settings
+   # All three of these must be set if you plan to use dial-up. Failure
+   # to set any of these will likely result in a failed install. Currently
+   # the password must be in plain text.
+   # Note: If you want to use dial-up as your method for installing then
+   # be sure to appropriately set NET_INSTALL_TYPE.
+   #DIALUP_USERNAME="bxxxnxnx"
+   #DIALUP_PASSWORD="xxxx"
+   #DIALUP_NUMBER="1234567890"
+
+   # Set this to 1 if you want glis to fetch all files before compiling and
+   # installing a set of packages. Set to 0 or leave unset if you want your
+   # internet connection to be active throughout the entire install.
+   # Note: This is currently unsupported. Your dialup connection will be
+   # active throughout the install process and you will need to manually
+   # terminate it after the install completes. To terminate the dial-up
+   # run the command: killall wvdial
+   #DIALUP_ON_DEMAND="0"
+
+#---------------------------#
+# DSL (PPPOE only) Settings #
+#---------------------------#
+
+   # Future DSL configuration options
+   # !!! None of this has been implemented in GLIS !!!
+
+   # To use DSL for the install remember to set NET_INSTALL_TYPE=1.
+   # DSL configuration will use the nameservers specified above.
+   #DSL_IFACE="eth0"
+   #DSL_USERNAME="bxxxnxnx@sympatico.ca"
+   #DSL_PASSWORD="xxxx"
+
+   # Activate on demand
+   # If you want the link to come up on demand, enter the value in seconds
+   # after which the link should be dropped. If this is set to 0 or left
+   # unset the link will stay up permanently.
+   #DSL_ON_DEMAND=0
+
+   # 0 - None (Default)
+   # 1 - Standalone
+   # 2 - Masquerade
+   #DSL_FIREWALL=0
+
+#-----------------#
+# Partition Setup #
+#-----------------#
+
+   # Partition Guidelines:
+   # This is how I think partitioning should be setup.
+   # DISCLAIMER!!!!!! Wrong settings here WILL screw up your system!!!!
+   # BE CAREFUL!!!
+   # Again, x = partition number (this does NOT correspond to the /dev/hdax
+   # number). x should simply increase (starting at 0) as you add partitions
+   # to this file
+   
+   # This is pretty self explanitory.
+   # Partition 'x' refers to "/dev/sda2" device.
+   # To mount an NFS partition use PARTITION[x]="server:/path/to/mountpoint"
+   # and be sure to add a PARTITION_MOUNT entry.
+   PARTITION[0]="/dev/sda1"
+   PARTITION[1]="/dev/sda2"
+   PARTITION[2]="/dev/sda3"
+   
+   # This is how big the partition should be.
+   # NOTE: if this is NOT NULL, the partition will be erased and repartitioned!
+   # NOTE: THIS MEANS TOTAL DATA LOSS!!!
+   # If this is not set, then it will use the existing partition(s) on the drive
+   # It should follow the below options for sizing:
+   PARTITION_SIZE[0]="128M" # Size in MB
+   PARTITION_SIZE[1]="2048M" # Size in MB
+   PARTITION_SIZE[2]="@" # Fill to the end of the disk
+
+   #PARTITION_SIZE[x]="40%" # Size in % of total drive space
+   #PARTITION_SIZE[x]="@" 
+   # This special character ('@')means to take up the rest of the drive
+   # If you are set up GLIS to save the partition AFTER the current one, 
+   # '@' will fill up to that partition
+   
+   # This determines whether or not a partition gets formated.
+   # ie. If it is set to ext3, it will format the partition for ext3
+   # If it is not set, the partition will not be formated.
+   # If the drive has been repartitioned and this is not set, install will fail
+   # because drive will have no usable format.
+   # Valid types are:
+   #  - ext2
+   #  - ext3
+   #  - reiserfs
+   #  - xfs
+   #  - jfs
+   #  - swap
+   #  - extended
+   #  - nfs
+   # (NOTE: "extended" is for extended partitions. All paritions after
+   # partition number 4 (ie. /dev/hda5) will be placed in the extended
+   # partition.) Also, only 1 extended partition can be defined.
+   PARTITION_TYPE[0]="ext2"
+   PARTITION_TYPE[1]="swap"
+   PARTITION_TYPE[2]="ext4"
+   
+   # This is the mount point for the partition.
+   # This is relative to the new (chroot) system
+   # ie. '/' will mount to /mnt/gentoo/
+   # For swap partitions, the proper mount point is "swap"
+   PARTITION_MOUNT[0]="/boot"
+   PARTITION_MOUNT[1]="swap"
+   PARTITION_MOUNT[2]="/"
+      
+   # This should cover just about all partitioning needs.  Any that aren't
+   # covered by this can and should be added into a frontend.  The front end
+   # can do all the partitioning and then just pass the mounting and/or
+   # formating to glis.
+   
+   # I also want to get NFS mounts in here as well, but it is not setup in the
+   # fstab config yet, so we'll have to do that after we get the initial part
+   # working.   
+
+#----------------------#
+# Installation Options #
+#----------------------#
+
+   # Which type install should we perform?
+   # Options are 1-3
+   # 1 - Bootstrap(Source), Emerge System(Source)
+   # 2 - Bootstrap(Binary), Emerge System(Source)
+   # 3 - Bootstrap(Binary), Emerge System(Binary)
+   INSTALL_STAGE=3
+
+   # Stage Tarball Location
+   # This includes the name of the tarball
+   # ie. "/mnt/zip/myowntarball.tar.bz2"
+   # If not defined, it automatically gets the appropriate stage tarball from
+   # the CD.
+   # Optionally you can specify a tarball's url, with either an http:// or
+   # ftp:// prefix.
+   # TARBALL_LOCATION="/mnt/cdrom/stages/stage3-x86-20030910.tar.bz2"
+   TARBALL_LOCATION="ftp://ftp.df.lth.se/pub/gentoo/releases/amd64/autobuilds/current-stage3-amd64/stage3-amd64-20130523.tar.bz2"
+
+
+   # Portage Tree
+   # This can be set to one of the following:
+   # PORTAGE_TREE=""
+   # PORTAGE_TREE="SYNC"
+   # PORTAGE_TREE="/path/to/portage-snapshot.tar.bz2"
+   # If PORTAGE_TREE is not set then the portage tree will not be
+   # touched. This is useful if you plan to remotely mount a portage tree.
+   # When set to "SYNC", GLIS will run an 'emerge sync'. If you have
+   # NET_INSTALL_TYPE=3, then do not set to SYNC!
+   # When set to anything else GLIS will untar/compress the portage tree
+   # to /usr/portage. Note that only tar bz2 files will be accepted.
+   # PORTAGE_TREE="/mnt/cdrom/snapshots/portage-*.tar.bz2"
+   PORTAGE_TREE="ftp://ftp.df.lth.se/pub/gentoo/releases/snapshots/current/portage-latest.tar.bz2"
+
+   # This is the flags to be used during install for the emerge command
+   # For instance, if you want to use binary packages when available, add "-k"
+   # To add verbosity to binary packages, add "-kv"
+   # Be careful here, some options will make the install not work (like "-p")
+   # Another option that COULD cause it to break in some cases is "-K"
+   # In other words, just be careful and think through your decisions!
+   #EMERGE_OPTIONS="-k"
+   
+   # Desired time zone
+   # Time zones are found in /usr/share/zoneinfo/
+   # Some examples with correct syntax are below:
+   # If TIME_ZONE is not set, it will default to "UTC"
+   # If TIME_ZONE does not exits, it will default to "UTC"
+   TIME_ZONE="UTC"
+   #TIME_ZONE="US/Eastern"
+   #TIME_ZONE="Asia/Macao"
+
+   # This is the root password hash
+   # DO NOT put a cleartext password on this line
+   # If you need to generate the password hash on the liveCD, use grub-md5-crypt
+   # NOTE: This MUST (and I mean MUST) be enclosed by SINGLE ("'") quotes.
+   # If you leave the current hash in, the password will be "glisiscool"
+   ROOT_PASSWORD_HASH='$1$RvWE10$uBLxTnU9xDBQbcS1mXWL8.'
+   
+   # Extra Users
+   # Again an array. Replace 'x' with the next unused number starting at 0.
+   # USER_GROUPS MUST be comma seperated.
+   # If USER_SHELL is not set, it will default to "/bin/bash"
+   # If USER_GROUPS is not set, it will default to "users"
+   # If USER_HOME is not set, it will default to "/home/${USER_NAME}"
+   # If USER_UID is not set, it will set it to the system default
+   # If USER_COMMENT is not set, it will default to null.
+   # NOTE: USER_PASSWORD_HASH[x] MUST (and I mean MUST) be enclosed by
+   # SINGLE ("'")quotes.
+   # If you leave the current hash in, the password will be "glisiscool"
+   USER_NAME[0]="letharion"
+   USER_PASSWORD_HASH[0]='$1$RvWE10$uBLxTnU9xDBQbcS1mXWL8.'
+   USER_GROUPS[0]="users,wheel"
+   USER_SHELL[0]="/bin/bash"
+   USER_HOME[0]="/home/letharion"
+   USER_UID[0]=""
+   USER_COMMENT[0]="Claes"
+
+#------------------#
+# Software Options #
+#------------------#
+
+   # Kernel Sources:
+   # you can either just name the ebuild you'd like to get
+   # or specify a specific version as you would for emerge
+   KERNEL_SOURCE="gentoo-sources"
+
+   # Genkernel Option:
+   # Do you want to make your own custom kernel or use the genkernel utility?
+   # If not set, it defaults to 1 (ie. true, use genkernel).
+   GENKERNEL=0
+   
+   # Kernel Config:
+   # Path to kernel config file.
+   # Can be used with or without genkernel
+   KERNEL_CONFIG="/root/glis/configs/kernel_config-3.8.13"
+   
+   # Kernel Modules:
+   # Modules you want to load at boot time on first reboot (comma seperated)
+   KERNEL_MODULES=""
+   
+   # Bootloader:
+   # If BOOT_LOADER is not set, it will default to "grub"
+   BOOT_LOADER="grub"
+   #BOOT_LOADER="lilo"
+
+   # Load bootloader to MBR?
+   # If you choose false (0) it will install to your boot partition.
+   # If you have no boot partition, it will install to your root partition.
+   BOOT_LOADER_MBR="1"
+   #BOOT_LOADER_MBR="0"
+   
+   # System Logger:
+   # If SYSTEM_LOGGER is not set, it will default to "metalog"
+   # SYSTEM_LOGGER="metalog"
+   #SYSTEM_LOGGER="sysklogd"
+   SYSTEM_LOGGER="syslog-ng"
+   #SYSTEM_LOGGER="msyslog"
+
+   # CRON Daemon:
+   # If CRON_DAEMON is not set, it will default to "vixie-cron"
+   CRON_DAEMON="vixie-cron"
+   #CRON_DAEMON="fcron"
+   #CRON_DAEMON="dcron"
+
+   # Other utilities to emerge
+   # Options are :
+   # - pcmcia-cs
+   # - rp-pppoe
+   # - xfsprogs
+   # - reiserfsprogs
+   # - jfsutils
+   # - lvm-user
+   # You can choose one or more of the above options, just seperate them by
+   # spaces This is also optional, so if you don't want any of these, just
+   # comment this out.
+   # NOTE: This is not for general programs, see MISC_PROGRAMS for that.
+   UTILITIES=""
+   
+   # These are programs that you want to emerge after the installation is
+   # complete. You can install anything that is in portage during this stage.
+   # This is also optional, so if you don't want any of these, just comment
+   # this out.
+   MISC_PROGRAMS="apache mysql php"
+
+#--------------#
+# Config Files #
+#--------------#
+
+   # Rather than just appending the whole set of config files to this file
+   # it will be easier to do something more tactful.
+   # Here is the syntax for config files:
+   # #== /path/to/config.file?SETTING="option1 options2"
+   #
+   # So for example, you could do the following:
+   # #== /etc/make.conf?USE="X gnome gtk alsa"
+   # #== /etc/rc.conf?EDITOR="nano -w"
+   #
+   # NOTE: It is VERY essential that the line begins with a #==
+   #
+   # This method can be used for ONLY the following files:
+   # /etc/rc.conf
+   # /etc/make.conf
+   # Other config files are generated by GLIS.
+
+#------------------#
+# Advanced Options #
+#------------------#
+
+   # Distcc hosts
+   # If you wish to use distcc during the install set your distcc hosts
+   # here. If no hosts are set, distcc will not be used.
+   #DISTCC_HOSTS="192.168.0.1"
+
+   # User hooks location
+   # User hooks are used if you want to add additional scripting code to run
+   # during a GLIS installation. Each 'hook' script will have a name that
+   # follows the below format:
+   # XXX-pre.sh or XXX-post.sh
+   # Where XXX represents the first three digits in that steps filename.
+   # i.e. if the steps filename is 100-implement_config.sh then your
+   # pre and post hooks should be:
+   # 100-pre.sh and 100-post.sh
+   #
+   # In the event that step is fully contained within the glis script, i.e.
+   # steps 6, 7, and 11, use the values 060, 070, and 110, for XXX
+   # respectively.
+   #
+   # The file MUST be a bash script, and all lower case.
+   # Note that these scripts will NOT be run in the chroot environment.
+   # Defaults to the current directory if not set. 
+   #HOOKS_LOCATION="hooks/"
+
+
+# This configuration was generated by GLIS
+HOOKS_LOCATION="./"
